@@ -21,7 +21,7 @@ import reactor.core.publisher.Flux;
  */
 @RestController
 @RequestMapping("/api/gps/data")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "https://satellite-tracking-dashboard-demo.vercel.app")
 @Tag(name = "GPS Data", description = "Endpoints for live GPS satellite status")
 @Slf4j
 public class GPSController {
