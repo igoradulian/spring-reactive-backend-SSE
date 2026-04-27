@@ -1,5 +1,12 @@
 # Web Flux Demo
 
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+![Java](https://img.shields.io/badge/Java-17-orange)
+![Spring_Boot](https://img.shields.io/badge/Spring_Boot-4.x-6DB33F)
+![WebFlux](https://img.shields.io/badge/WebFlux-reactive-blue)
+![Maven](https://img.shields.io/badge/Maven-build-C71A36)
+![MQTT](https://img.shields.io/badge/MQTT-HiveMQ-00A3E0)
+
 Reactive Spring Boot service that connects to HiveMQ Cloud over MQTT v5, parses GPS satellite payloads, and streams updates to clients via Server-Sent Events (SSE).
 
 ## Features
@@ -10,7 +17,7 @@ Reactive Spring Boot service that connects to HiveMQ Cloud over MQTT v5, parses 
 - Publishes live updates from `/api/gps/data/subscribe` as SSE
 - Includes unit and controller tests with JUnit 5 + Mockito + WebTestClient
 
-## Tech Stack
+## Coding Stack
 
 - Java 17
 - Spring Boot 4 (WebFlux)
@@ -102,4 +109,3 @@ Run specific tests:
 - `src/main/java/org/demo/webfluxdemo/controller` - SSE endpoint
 - `src/main/java/org/demo/webfluxdemo/dto` - GPS payload records
 - `src/test/java/org/demo/webfluxdemo` - unit/integration tests
-
