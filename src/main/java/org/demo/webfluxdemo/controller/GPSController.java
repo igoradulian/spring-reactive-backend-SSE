@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.demo.webfluxdemo.dto.GpsStatusDTO;
 import org.demo.webfluxdemo.service.HiveMQSubscriberService;
 import org.springframework.http.MediaType;
@@ -22,6 +23,7 @@ import reactor.core.publisher.Flux;
 @RequestMapping("/api/gps/data")
 @CrossOrigin(origins = "http://localhost:5173")
 @Tag(name = "GPS Data", description = "Endpoints for live GPS satellite status")
+@Slf4j
 public class GPSController {
 
     private final HiveMQSubscriberService subscriberService;
@@ -47,7 +49,13 @@ public class GPSController {
     )
     @GetMapping(path = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<ServerSentEvent<GpsStatusDTO>> subscribeToGPSData() {
+        log.info("New SSE subscription opened for /api/gps/data/subscribe");
+
         return subscriberService.getMessages()
+                .doOnNext(gpsStatus -> log.debug("Streaming GPS update: visibleCount={}, usedCount={}, satellites={}",
+                        gpsStatus.visibleCount(),
+                        gpsStatus.usedCount(),
+                        gpsStatus.satellites() == null ? 0 : gpsStatus.satellites().size()))
                 .map(gpsStatus -> ServerSentEvent.<GpsStatusDTO>builder()
                         .event("sky-update")
                         .data(gpsStatus)

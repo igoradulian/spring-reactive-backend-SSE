@@ -31,37 +31,40 @@ public class HiveMQSubscriberService {
 
     @PostConstruct
     public void start() {
+        log.info("Starting HiveMQ subscriber service");
         subscribe();
     }
 
     public void subscribe() {
+        log.info("Attempting MQTT connection to configured broker");
+
         mqttConfig.mqtt5AsyncClient()
                 .connect()
-                .whenComplete(
-                        (connAck, throwable) -> {
-                            if (throwable != null) {
-                                log.warn("Failed to connect to MQTT broker: {}", throwable.getMessage());
-                            } else {
-                                log.warn("Connected to MQTT broker successfully");
-                            }})
+                .whenComplete((connAck, throwable) -> {
+                    if (throwable != null) {
+                        log.error("Failed to connect to MQTT broker", throwable);
+                    } else {
+                        log.info("Connected to MQTT broker successfully");
+                    }
+                })
                 .thenCompose(connAck ->
                         mqttConfig.mqtt5AsyncClient()
                                 .subscribeWith()
                                 .topicFilter("gps/satellites")
                                 .callback(publish -> {
-                                 try {
-                                    byte[] payload = publish.getPayloadAsBytes();
-                                    GpsStatusDTO gpsStatus = objectMapper.readValue(payload, GpsStatusDTO.class);
-                                    Sinks.EmitResult result = sink.tryEmitNext(gpsStatus);
-                                    if (result.isFailure()) {
-                                        log.warn("Sink emit failed: {}",result);
+                                    try {
+                                        byte[] payload = publish.getPayloadAsBytes();
+                                        GpsStatusDTO gpsStatus = objectMapper.readValue(payload, GpsStatusDTO.class);
+                                        Sinks.EmitResult result = sink.tryEmitNext(gpsStatus);
+                                        if (result.isFailure()) {
+                                            log.warn("Sink emit failed: {}", result);
+                                        }
+                                    } catch (Exception e) {
+                                        log.warn("Failed to parse MQTT payload", e);
                                     }
-                                }
-                                 catch (Exception e) {
-                                     log.warn("Failed to parse MQTT payload: {}", e.getMessage());
-                                 }
                                 })
                                 .send()
                 )
-                .thenAccept(subAck -> log.warn("Subscribed successfully"));}
+                .thenAccept(subAck -> log.info("Subscribed successfully to topic: gps/satellites"));
+    }
 }

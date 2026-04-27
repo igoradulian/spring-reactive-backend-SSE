@@ -9,12 +9,14 @@ import org.springframework.context.annotation.Configuration;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 
 
 /**
  * @author Igor Adulyan
  */
 @Configuration
+@Slf4j
 public class MqttConfig {
 
     @Value("${MQTT_USER}")
@@ -31,9 +33,12 @@ public class MqttConfig {
 
     @Bean
     public Mqtt5AsyncClient mqtt5AsyncClient() {
+        String clientId = "webflux-subscriber-" + UUID.randomUUID();
+        log.info("Creating MQTT async client for host={} port={} clientId={}", host, port, clientId);
+
         return MqttClient.builder()
                 .useMqttVersion5()
-                .identifier("webflux-subscriber-" + UUID.randomUUID())
+                .identifier(clientId)
                 .serverHost(host)
                 .serverPort(port)
                 .sslWithDefaultConfig()
