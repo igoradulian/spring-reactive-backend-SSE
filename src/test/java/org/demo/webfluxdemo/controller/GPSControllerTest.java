@@ -48,7 +48,7 @@ class GPSControllerTest {
         when(subscriberService.getMessages()).thenReturn(Flux.just(first, second));
 
         Flux<ServerSentEvent<GpsStatusDTO>> eventFlux = webTestClient.get()
-                .uri("/gps/data/subscribe")
+                .uri("/api/gps/data/subscribe")
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .exchange()
                 .expectStatus().isOk()
@@ -59,7 +59,7 @@ class GPSControllerTest {
         StepVerifier.create(eventFlux.take(2))
                 .assertNext(event -> {
                     GpsStatusDTO payload = event.data();
-                    org.junit.jupiter.api.Assertions.assertEquals("gps-update", event.event());
+                    org.junit.jupiter.api.Assertions.assertEquals("sky-update", event.event());
                     org.junit.jupiter.api.Assertions.assertNotNull(payload);
                     org.junit.jupiter.api.Assertions.assertEquals(12, payload.visibleCount());
                     org.junit.jupiter.api.Assertions.assertEquals(4, payload.usedCount());
@@ -68,7 +68,7 @@ class GPSControllerTest {
                 })
                 .assertNext(event -> {
                     GpsStatusDTO payload = event.data();
-                    org.junit.jupiter.api.Assertions.assertEquals("gps-update", event.event());
+                    org.junit.jupiter.api.Assertions.assertEquals("sky-update", event.event());
                     org.junit.jupiter.api.Assertions.assertNotNull(payload);
                     org.junit.jupiter.api.Assertions.assertEquals(8, payload.visibleCount());
                     org.junit.jupiter.api.Assertions.assertEquals(5, payload.usedCount());
@@ -81,7 +81,7 @@ class GPSControllerTest {
         when(subscriberService.getMessages()).thenReturn(Flux.empty());
 
         Flux<ServerSentEvent<GpsStatusDTO>> eventFlux = webTestClient.get()
-                .uri("/gps/data/subscribe")
+                .uri("/api/gps/data/subscribe")
                 .accept(MediaType.TEXT_EVENT_STREAM)
                 .exchange()
                 .expectStatus().isOk()
